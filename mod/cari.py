@@ -20,6 +20,7 @@ class Search:
         if self.limit == 10:
             r = requests.get(self.url+self.query, headers=self.head)
             beauty = bs(r.text, 'html.parser')
+
             if "Penelusuran Google" in beauty.title.text:
                 get_link = beauty.find_all('div', {'class': 'yuRUbf'})
                 for link in get_link:
@@ -39,6 +40,7 @@ class Search:
                 r = requests.get(self.url+self.query +
                                  "&start="+str(x), headers=self.head)
                 beauty = bs(r.text, 'html.parser')
+
                 if "Penelusuran Google" in beauty.title.text:
                     get_link = beauty.find_all('div', {'class': 'yuRUbf'})
                     for link in get_link:

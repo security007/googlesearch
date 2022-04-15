@@ -49,7 +49,7 @@ def main():
 
     # print results
     for result in results:
-        if result == "Captcha blocked ":
+        if result == "Captcha blocked":
             print(Color.red+"Captcha blocked")
             print(Color.green+"Sleeping for 10 seconds and exit")
             time.sleep(10)
