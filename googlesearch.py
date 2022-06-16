@@ -2,6 +2,9 @@ from mod.cari import Search
 import argparse
 import colorama
 import time
+import sys
+import re
+import requests
 
 
 class Color:
@@ -32,6 +35,8 @@ def main():
                         help="Save results to file", default=None)
     parser.add_argument(
         '-d', '--domain', help="Get only domain name", action='store_true')
+    parser.add_argument(
+        '--proxy', help="Set proxy, ip:port", default=None)
     args = parser.parse_args()
 
     # set query
@@ -42,9 +47,32 @@ def main():
         domain = True
     else:
         domain = False
+    proxy = args.proxy
     save = args.save
     # start search
-    search = Search(query=query, limit=limit, domain=domain, save=save)
+    # cek proxy format
+    if proxy != None:
+        print(Color.green+"Checking proxy ")
+        # grep proxy
+        if re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{1,5}$", proxy):
+            # checking proxy
+            setproxy = {
+                'http': 'http://'+proxy,
+                'https': 'https://'+proxy,
+            }
+            try:
+                r = requests.get('https://www.google.com/',
+                                 proxies=setproxy, timeout=10).status_code
+                print(Color.green+"Proxy status "+str(r))
+            except Exception as e:
+                print(Color.red+"Proxy not working")
+                sys.exit()
+
+        else:
+            print(Color.red+"Proxy format not valid")
+            sys.exit()
+    search = Search(query=query, limit=limit,
+                    domain=domain, save=save, proxy=proxy)
     results = search.get_results()
 
     # print results
@@ -53,10 +81,12 @@ def main():
             print(Color.red+"Captcha blocked")
             print(Color.green+"Sleeping for 10 seconds and exit")
             time.sleep(10)
+            print(Color.red+"Exit...")
+            sys.exit()
         elif result == "No results":
             print(Color.yellow+"No results")
         else:
-            print(Color.green+result)
+            print(Color.green+str(result))
     if results[0] != "Captcha blocked" and results[0] != "No results":
         if save != None:
             print(Color.save+"Saved to "+save)

@@ -3,11 +3,13 @@ from bs4 import BeautifulSoup as bs
 
 
 class Search:
-    def __init__(self, query, limit=10, domain=False, save=None):
+    def __init__(self, query, limit=10, domain=False, save=None, proxy=None):
         self.query = query
         self.limit = limit
         self.domain = domain
         self.save = save
+        self.proxy = proxy
+
         self.head = {
             'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36'}
         self.url = 'https://www.google.com/search?q='
@@ -18,7 +20,15 @@ class Search:
 
     def get_results(self):
         if self.limit == 10:
-            r = requests.get(self.url+self.query, headers=self.head)
+            if self.proxy != None:
+                setproxy = {
+                    'http': 'http://'+self.proxy,
+                    'https': 'https://'+self.proxy,
+                }
+                r = requests.get(self.url+self.query, headers=self.head,
+                                 proxies=setproxy)
+            else:
+                r = requests.get(self.url+self.query, headers=self.head)
             beauty = bs(r.text, 'html.parser')
 
             if "Penelusuran Google" in beauty.title.text:
@@ -37,8 +47,16 @@ class Search:
                 self.results.append(0)
         else:
             for x in range(0, self.limit, 10):
-                r = requests.get(self.url+self.query +
-                                 "&start="+str(x), headers=self.head)
+                if self.proxy != None:
+                    setproxy = {
+                        'http': 'http://'+self.proxy,
+                        'https': 'https://'+self.proxy,
+                    }
+                    r = requests.get(self.url+self.query +
+                                     "&start="+str(x), headers=self.head, proxies=self.setproxy)
+                else:
+                    r = requests.get(self.url+self.query +
+                                     "&start="+str(x), headers=self.head)
                 beauty = bs(r.text, 'html.parser')
 
                 if "Penelusuran Google" in beauty.title.text:

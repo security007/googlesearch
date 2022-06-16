@@ -29,4 +29,5 @@ optional arguments:
                         limit of results, Default : 10
   -s SAVE, --save SAVE  Save results to file
   -d, --domain          Get only domain name
+  --proxy PROXY         Set proxy, ip:port
 ```
