@@ -1,5 +1,4 @@
 # Google Search
-
 Python tool to get google search results
 
 # Python Version
